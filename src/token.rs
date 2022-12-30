@@ -1,6 +1,3 @@
-use core::num;
-
-#[derive(Clone)]
 pub enum TokenKind {
     // Identifiers
     Identifier(String),
@@ -60,7 +57,7 @@ pub enum TokenKind {
     DirectionOp,      // <-
 
     // Punctuation
-    Colon,     // ,
+    Colon,     // :
     Semicolon, // ;
     Dot,       // .
     Comma,     // ,
@@ -149,7 +146,7 @@ impl ToString for TokenKind {
                 Self::LogicLessEqOp => "<=",
                 Self::LogicGreaterEqOp => ">=",
                 Self::DirectionOp => "<-",
-                Self::Colon => ",",
+                Self::Colon => ":",
                 Self::Semicolon => ";",
                 Self::Dot => ".",
                 Self::Comma => ",",

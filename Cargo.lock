@@ -3,13 +3,6 @@
 version = 3
 
 [[package]]
-name = "Compiler"
-version = "0.1.0"
-dependencies = [
- "clap",
-]
-
-[[package]]
 name = "ansi_term"
 version = "0.12.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -48,6 +41,13 @@ dependencies = [
  "textwrap",
  "unicode-width",
  "vec_map",
+]
+
+[[package]]
+name = "compiler"
+version = "0.1.0"
+dependencies = [
+ "clap",
 ]
 
 [[package]]
