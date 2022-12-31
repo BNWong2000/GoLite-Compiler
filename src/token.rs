@@ -5,7 +5,7 @@ pub enum TokenKind {
     // Literals
     IntLiteral(i32),
     FloatLiteral(f32),
-    CharLiteral(char),
+    CharLiteral(String), // make it a string so it prints a bit nicer.
     StringLiteral(String),
 
     // Braces
@@ -45,10 +45,10 @@ pub enum TokenKind {
     LogicOrOp,        // ||
     LogicNotOp,       // !
     LogicEqOp,        // ==
-    LogicLShiftOp,    // <<
-    LogicLShiftEqOp,  // <<=
-    LogicRShiftOp,    // >>
-    LogicRShiftEqOp,  // >>=
+    LShiftOp,         // <<
+    LShiftEqOp,       // <<=
+    RShiftOp,         // >>
+    RShiftEqOp,       // >>=
     LogicNotEqOp,     // !=
     LogicLessOp,      // <
     LogicGreaterOp,   // >
@@ -57,11 +57,13 @@ pub enum TokenKind {
     DirectionOp,      // <-
 
     // Punctuation
-    Colon,     // :
-    Semicolon, // ;
-    Dot,       // .
-    Comma,     // ,
-    Elipses,   // ...
+    Colon,            // :
+    Semicolon,        // ;
+    Dot,              // .
+    Comma,            // ,
+    Elipses,          // ...
+    DoubleQuote,      // "
+    SingleQuote,      // '
 
     // Keywords
     BreakKeyword,
@@ -136,10 +138,10 @@ impl ToString for TokenKind {
                 Self::LogicOrOp => "||",
                 Self::LogicNotOp => "!",
                 Self::LogicEqOp => "==",
-                Self::LogicLShiftOp => "<<",
-                Self::LogicLShiftEqOp => "<<=",
-                Self::LogicRShiftOp => ">>",
-                Self::LogicRShiftEqOp => ">>=",
+                Self::LShiftOp => "<<",
+                Self::LShiftEqOp => "<<=",
+                Self::RShiftOp => ">>",
+                Self::RShiftEqOp => ">>=",
                 Self::LogicNotEqOp => "!=",
                 Self::LogicLessOp => "<",
                 Self::LogicGreaterOp => ">",
@@ -151,6 +153,8 @@ impl ToString for TokenKind {
                 Self::Dot => ".",
                 Self::Comma => ",",
                 Self::Elipses => "...",
+                Self::DoubleQuote => "\"",
+                Self::SingleQuote => "\'",
                 Self::BreakKeyword => "break",
                 Self::DefaultKeyword => "default",
                 Self::FuncKeyword => "func",

@@ -13,7 +13,7 @@ Floats with either or both of the integral and decimal parts included.
 Char Literals, including the following escapes:
 ```
 \a \b \f \n \r
-\t \v \\ \’ \"
+\t \v \\ \' \"
 ```
 Chars will be 7-bit ASCII standard (non-extended ascii)
 Interpreted String Literals (i.e., C-Style string literals)
@@ -34,7 +34,7 @@ continue     for          import       return       var
 *    ^     *=    ^=     <-    >     >=    {    }
 /    <<    /=    <<=    ++    =     :=    ,    ;
 %    >>    %=    >>=    --    !     ...   .    :
-&^   &^=   ~
+&^   &^=   ~     "      '
 ```
 
 #### Comments:
