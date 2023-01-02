@@ -1,6 +1,5 @@
 use std::fs::File;
 use std::io::{BufReader, BufRead};
-use std::thread::panicking;
 use crate::token::{self, TokenKind};
 
 const EOF_CHAR: char = 0xFF as char;
@@ -254,7 +253,13 @@ impl Lexer {
             '\"' => self.handle_strings(),
             '\'' => self.handle_char(),
             _ => {
-                panic!("ERROR: Unknown character found on line {}", self.current_line);
+                if self.current_char.is_ascii_alphabetic() || self.current_char == '_' {
+                    self.handle_identifers_and_keywords()
+                } else if self.current_char.is_digit(10) {
+                    self.handle_number()
+                }else {
+                    panic!("ERROR: Unknown character found on line {}", self.current_line);
+                }
             }
         }
     }
@@ -323,7 +328,7 @@ impl Lexer {
     }
 
     fn handle_strings(&mut self) -> TokenKind {
-        let mut string_result: Vec<char> = vec!['\"'];
+        let mut string_result: Vec<char> = vec![];
         self.advance();
         while self.current_char != '\"' {
             if self.current_char == '\\' {
@@ -344,7 +349,7 @@ impl Lexer {
  
     fn handle_char(&mut self) -> TokenKind {
         self.advance();
-        let mut char_result: Vec<char> = vec!['\''];
+        let mut char_result: Vec<char> = vec![];
         if self.current_char == '\'' {
             panic!("ERROR: empty character");
         }
@@ -363,7 +368,6 @@ impl Lexer {
         if self.current_char != '\'' {
             panic!("ERROR: invalid char literal");
         }
-        char_result.push('\'');
         self.advance();
         TokenKind::CharLiteral(char_result.into_iter().collect::<String>().to_string())
     }
@@ -375,6 +379,66 @@ impl Lexer {
             true
         } else {
             false
+        }
+    }
+
+    fn handle_number(&mut self) -> TokenKind {
+        let mut number = String::new();
+        number.push(self.current_char);
+        self.advance();
+        while self.current_char.is_digit(10) {
+            number.push(self.current_char);
+            self.advance();
+        }
+        let int_result = number.parse::<i32>().unwrap();
+        if self.current_char == '.' {
+            self.advance();
+            let mut float_result = int_result as f32;
+            if self.current_char.is_digit(10) {
+                let decimal_part = self.handle_decimal();
+                float_result = float_result + decimal_part;
+            }
+            TokenKind::FloatLiteral(float_result)
+        } else {
+            TokenKind::IntLiteral(int_result)
+        }
+    }
+
+    fn handle_identifers_and_keywords(&mut self) -> TokenKind {
+        let mut word = String::new();
+        word.push(self.current_char);
+        self.advance();
+        while self.current_char.is_ascii_alphanumeric() || self.current_char == '_' {
+            word.push(self.current_char);
+            self.advance();
+        }
+        match word.as_str() {
+            "break" => TokenKind::BreakKeyword,
+            "default" => TokenKind::DefaultKeyword,
+            "func" => TokenKind::FuncKeyword,
+            "interface" => TokenKind::InterfaceKeyword,
+            "select" => TokenKind::SelectKeyword,
+            "case" => TokenKind::CaseKeyword,
+            "defer" => TokenKind::DeferKeyword,
+            "go" => TokenKind::GoKeyword,
+            "map" => TokenKind::MapKeyword,
+            "struct" => TokenKind::StructKeyword,
+            "chan" => TokenKind::ChanKeyword,
+            "else" => TokenKind::ElseKeyword,
+            "goto" => TokenKind::GotoKeyword,
+            "package" => TokenKind::PackageKeyword,
+            "switch" => TokenKind::SwitchKeyword,
+            "const" => TokenKind::ConstKeyword,
+            "fallthrough" => TokenKind::FallThroughKeyword,
+            "if" => TokenKind::IfKeyword,
+            "range" => TokenKind::RangeKeyword,
+            "type" => TokenKind::TypeKeyword,
+            "continue" => TokenKind::ContinueKeyword,
+            "for" => TokenKind::ForKeyword,
+            "import" => TokenKind::ImportKeyword,
+            "return" => TokenKind::ReturnKeyword,
+            "var" => TokenKind::VarKeyword,
+            _ => TokenKind::Identifier(word)
         }
     }
 
