@@ -1,0 +1,41 @@
++    &     +=    &=     &&    ==    !=    (    )
+-    |     -=    |=     ||    <     <=    [    ]
+*    ^     *=    ^=     <-    >     >=    {    }
+/    <<    /=    <<=    ++    =     :=    ,    ;
+%    >>    %=    >>=    --    !     ...   .    :
+&^   &^=   ~ 
+
+// comment - should be ignore. 
+
+/*
+
+multiline should also be ignored. 
+Here are some keywords that shouldn't show up:
+
+if else for
+
+*/
+
+break        default      func         interface    select
+case         defer        go           map          struct
+chan         else         goto         package      switch
+const        fallthrough  if           range        type
+continue     for          import       return       var
+
+// int
+123
+
+// floats
+.123
+1.23
+123.
+
+// strings
+"HOADKGE\n\t\r"
+
+"asdf" 
+
+//char lit
+
+'a'
+'\n'

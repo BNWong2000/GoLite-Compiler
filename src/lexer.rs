@@ -39,12 +39,11 @@ impl Lexer {
 
     pub fn lex(&mut self) -> token::TokenKind {
         self.skip_whitespace();
-        
         match self.current_char {
             EOF_CHAR => TokenKind::EOF,
             '(' => {
                 self.advance();
-                TokenKind::LeftParen
+                TokenKind::LeftParen 
             },
             ')' => {
                 self.advance();
@@ -124,6 +123,23 @@ impl Lexer {
                     '=' => {
                         self.advance();
                         TokenKind::DivEqOp
+                    }
+                    '/' => {
+                        while self.current_char != '\n' {
+                            self.advance();
+                        }
+                        TokenKind::Comment
+                    }
+                    '*' => {
+                        let mut star_found = false;
+                        loop {
+                            self.advance();
+                            if star_found && self.current_char == '/' {
+                                break;
+                            }
+                            star_found = self.current_char == '*';
+                        }
+                        TokenKind::Comment
                     }
                     _ => {
                         TokenKind::DivOp
@@ -337,13 +353,13 @@ impl Lexer {
                 if !self.is_valid_escape_sequence_char(self.current_char) {
                     panic!("ERROR: Invalid escape character sequence");
                 }
-            }
-            if self.is_escape(self.current_char) {
+            } else if self.is_escape(self.current_char) {
                 panic!("ERROR: Escape character inside of string (perhaps you want to use a valid escape sequence instead?)");
             }
             string_result.push(self.current_char);
             self.advance()
         }
+        self.advance();
         TokenKind::StringLiteral(string_result.into_iter().collect::<String>().to_string())
     }
  
@@ -359,8 +375,7 @@ impl Lexer {
             if !self.is_valid_escape_sequence_char(self.current_char) {
                 panic!("ERROR: Invalid escape character sequence");
             }
-        }
-        if self.is_escape(self.current_char) {
+        } else if self.is_escape(self.current_char) {
             panic!("ERROR: Escape character inside of char (perhaps you want to use a valid escape sequence instead?)");
         }
         char_result.push(self.current_char);
@@ -463,6 +478,57 @@ impl Lexer {
                 self.current_line += 1;
             }
             self.advance();
+        }
+    }
+}
+
+#[cfg(test)]
+pub mod lexer_test {
+    use crate::token::TokenKind;
+    /// TODO: Need to properly check these...
+    #[test]
+    pub fn given_valid_tokens_should_output_token_strings() {
+        let file_name = "testfiles/all_tokens.test".to_string();
+        let mut lexer = super::Lexer::new(file_name);
+        let mut curr_token = lexer.lex();
+        while curr_token != TokenKind::EOF {
+            print!("{}\n", curr_token.to_string() );
+            curr_token = lexer.lex();
+        }
+    }
+
+    #[test]
+    pub fn given_valid_strings_and_chars_should_output_correct_tokens() {
+        let file_name = "testfiles/strings_and_chars.test".to_string();
+        let mut lexer = super::Lexer::new(file_name);
+        let mut curr_token = lexer.lex();
+        while curr_token != TokenKind::EOF {
+            print!("{}\n", curr_token.to_string() );
+            curr_token = lexer.lex();
+        }
+    }
+
+    #[test]
+    #[should_panic]
+    pub fn given_invalid_strings_and_chars_should_panic() {
+        let file_name = "testfiles/illegal_strings_and_chars.test".to_string();
+        let mut lexer = super::Lexer::new(file_name);
+        let mut curr_token = lexer.lex();
+        while curr_token != TokenKind::EOF {
+            print!("{}\n", curr_token.to_string() );
+            curr_token = lexer.lex();
+        }
+    }
+
+    #[test]
+    #[should_panic]
+    pub fn given_invalid_tokens_should_panic() {
+        let file_name = "testfiles/illegal_tokens.test".to_string();
+        let mut lexer = super::Lexer::new(file_name);
+        let mut curr_token = lexer.lex();
+        while curr_token != TokenKind::EOF {
+            print!("{}\n", curr_token.to_string() );
+            curr_token = lexer.lex();
         }
     }
 }

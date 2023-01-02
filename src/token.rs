@@ -1,3 +1,4 @@
+#[derive(PartialEq)]
 pub enum TokenKind {
     // Identifiers
     Identifier(String),
@@ -92,6 +93,7 @@ pub enum TokenKind {
     ReturnKeyword,
     VarKeyword,
 
+    Comment,
     // End of file.
     EOF,
 }
@@ -99,11 +101,11 @@ pub enum TokenKind {
 impl ToString for TokenKind {
     fn to_string(&self) -> String {
         match self {
-            Self::Identifier(name) => name.clone(),
-            Self::IntLiteral(number) => format!("{}", number),
-            Self::FloatLiteral(number) => format!("{}", number),
-            Self::CharLiteral(character) => character.to_string(),
-            Self::StringLiteral(str) => str.clone(),
+            Self::Identifier(name) => format!("Identifier {}", name.clone()),
+            Self::IntLiteral(number) => format!("Int {}", number),
+            Self::FloatLiteral(number) => format!("Float {}", number),
+            Self::CharLiteral(character) => format!("Char {}", character.to_string()),
+            Self::StringLiteral(str) => format!("String \"{}\"",str.clone()),
             _ => match self {
                 Self::LeftParen => "(",
                 Self::RightParen => ")",
@@ -180,6 +182,7 @@ impl ToString for TokenKind {
                 Self::ImportKeyword => "import",
                 Self::ReturnKeyword => "return",
                 Self::VarKeyword => "var",
+                Self::Comment => "comment",
                 Self::EOF => "EOF",
                 _ => unreachable!(),
             }
