@@ -51,3 +51,169 @@ Follows part of the Go standard for semicolons. Specifically, semicolons are imp
 
 
 ### Grammar:
+```
+program         = "package" identifier ';' TopLevelDecl .
+
+TopLevelDecl    = Declaration | FunctionDecl | MethodDecl .
+
+Declaration     = ConstDecl | TypeDecl | VarDecl .
+
+ConstDecl       = "const" ( ConstSpec | "(" { ConstSpec ";" } ")" ) .
+
+ConstSpec       = IdentifierList [ [ Type ] "=" ExpressionList ] .
+
+IdentifierList  = identifier { "," identifier } .
+
+Type            = TypeName [ TypeArgs ] | TypeLit | "(" Type ")" .
+TypeName        = identifier
+TypeArgs        = "[" TypeList [ "," ] "]" .
+TypeList        = Type { "," Type } .
+TypeLit         = ArrayType | StructType | PointerType | FunctionType | InterfaceType |
+                  SliceType | MapType | ChannelType .
+
+ArrayType       = "[" Expression "]" Type .
+
+StructType      = "struct" "{" { FieldDecl ";" } "}" .
+FieldDecl       = (IdentifierList Type | EmbeddedField) [ string_lit ] .
+EmbeddedField   = [ "*" ] TypeName [ TypeArgs ] .
+
+PointerType     = "*" Type .
+
+FunctionType    = "func" Signature .
+Signature       = Parameters [ Result ] .
+Result          = Parameters | Type .
+Parameters      = "(" [ ParameterList [ "," ] ] ")" .
+ParameterList   = ParameterDecl { "," ParameterDecl } .
+ParameterDecl   = [ IdentifierList ] [ "..." ] Type .
+
+InterfaceType   = "interface" "{" { InterfaceElem ";" } "}" .
+InterfaceElem   = MethodElem | TypeElem .
+MethodElem      = identifier Signature .
+TypeElem        = TypeTerm { "|" TypeTerm } .
+TypeTerm        = Type | UnderlyingType .
+UnderlyingType  = "~" Type .
+
+SliceType       = "[" "]" Type .
+
+MapType         = "map" "[" Type "]" Type .
+
+ChannelType     = ( "chan" | "chan" "<-" | "<-" "chan" ) Type .
+
+ExpressionList  = Expression { "," Expression } .
+
+Expression      = UnaryExpr | Expression binary_op Expression .
+UnaryExpr       = PrimaryExpr | unary_op UnaryExpr .
+
+binary_op       = "||" | "&&" | rel_op | add_op | mul_op .
+rel_op          = "==" | "!=" | "<" | "<=" | ">" | ">=" .
+add_op          = "+" | "-" | "|" | "^" .
+mul_op          = "*" | "/" | "%" | "<<" | ">>" | "&" | "&^" .
+
+unary_op        = "+" | "-" | "!" | "^" | "*" | "&" | "<-" .
+
+PrimaryExpr     = Operand | Conversion | MethodExpr | PrimaryExpr Selector |
+	              PrimaryExpr Index | PrimaryExpr Slice | PrimaryExpr TypeAssertion |
+	              PrimaryExpr Arguments .
+
+Selector        = "." identifier .
+Index           = "[" Expression "]" .
+Slice           = "[" [ Expression ] ":" [ Expression ] "]" |
+                  "[" [ Expression ] ":" Expression ":" Expression "]" .
+TypeAssertion   = "." "(" Type ")" .
+Arguments       = "(" [ ( ExpressionList | Type [ "," ExpressionList ] ) [ "..." ] [ "," ] ] ")" .
+
+Operand         = Literal | identifier [ TypeArgs ] | "(" Expression ")" .
+Literal         = BasicLit | CompositeLit | FunctionLit .
+BasicLit        = int_lit | float_lit | rune_lit | string_lit .
+
+CompositeLit    = LiteralType LiteralValue .
+LiteralType     = StructType | ArrayType | "[" "..." "]" Type |
+                  SliceType | MapType | TypeName [ TypeArgs ] .
+LiteralValue    = "{" [ ElementList [ "," ] ] "}" .
+ElementList     = KeyedElement { "," KeyedElement } .
+KeyedElement    = [ Key ":" ] Element .
+Key             = FieldName | Expression | LiteralValue .
+FieldName       = identifier .
+Element         = Expression | LiteralValue .
+
+FunctionLit     = "func" Signature Block .
+
+Conversion      = Type "(" Expression [ "," ] ")" .
+
+MethodExpr      = Type "." identifier .
+
+TypeDecl        = "type" ( TypeSpec | "(" { TypeSpec ";" } ")" ) .
+TypeSpec        = AliasDecl | TypeDef .
+AliasDecl       = identifier "=" Type .
+TypeDef         = identifier [ TypeParameters ] Type .
+
+TypeParameters  = "[" TypeParamList [ "," ] "]" .
+TypeParamList   = TypeParamDecl { "," TypeParamDecl } .
+TypeParamDecl   = IdentifierList TypeConstraint .
+
+TypeConstraint  = TypeElem .
+
+VarDecl         = "var" ( VarSpec | "(" { VarSpec ";" } ")" ) .
+VarSpec         = IdentifierList ( Type [ "=" ExpressionList ] | "=" ExpressionList ) .
+
+FunctionDecl    = "func" identifier [ TypeParameters ] Signature [ Block ] .
+
+Block           = "{" StatementList "}" .
+StatementList   = { Statement ";" } .
+
+Statement       = Declaration | LabeledStmt | SimpleStmt | GoStmt | ReturnStmt | 
+                  BreakStmt | ContinueStmt | GotoStmt | "fallthrough" | Block | 
+                  IfStmt | SwitchStmt | SelectStmt | ForStmt | DeferStmt .
+
+SimpleStmt      = EmptyStmt | Expression | SendStmt | IncDecStmt | Assignment | ShortVarDecl .
+
+EmptyStmt       = .
+
+LabeledStmt     = identifier ":" Statement .
+
+GoStmt          = "go" Expression .
+ReturnStmt      = "return" [ ExpressionList ] .
+BreakStmt       = "break" [ identifier ] .
+ContinueStmt    = "continue" [ identifier ] .
+GotoStmt        = "goto" identifier .
+IfStmt          = "if" [ SimpleStmt ";" ] Expression Block [ "else" ( IfStmt | Block ) ] .
+SwitchStmt      = ExprSwitchStmt | TypeSwitchStmt .
+
+ExprSwitchStmt  = "switch" [ SimpleStmt ";" ] [ Expression ] "{" { ExprCaseClause } "}" .
+ExprCaseClause  = ExprSwitchCase ":" StatementList .
+ExprSwitchCase  = "case" ExpressionList | "default" .
+
+TypeSwitchStmt  = "switch" [ SimpleStmt ";" ] TypeSwitchGuard "{" { TypeCaseClause } "}" .
+TypeSwitchGuard = [ identifier ":=" ] PrimaryExpr "." "(" "type" ")" .
+TypeCaseClause  = TypeSwitchCase ":" StatementList .
+TypeSwitchCase  = "case" TypeList | "default" .
+
+SelectStmt      = "select" "{" { CommClause } "}" .
+CommClause      = CommCase ":" StatementList .
+CommCase        = "case" ( SendStmt | RecvStmt ) | "default" .
+RecvStmt        = [ ExpressionList "=" | IdentifierList ":=" ] Expression .
+
+SendStmt        = Expression "<-" Expression .
+
+ForStmt         = "for" [ Expression | ForClause | RangeClause ] Block .
+
+ForClause       = [ SimpleStmt ] ";" [ Condition ] ";" [ SimpleStmt ] .
+RangeClause     = [ ExpressionList "=" | IdentifierList ":=" ] "range" Expression .
+
+DeferStmt       = "defer" Expression .
+
+IncDecStmt      = Expression ( "++" | "--" ) .
+
+Assignment      = ExpressionList assign_op ExpressionList .
+
+assign_op       = [ add_op | mul_op ] "=" .
+
+ShortVarDecl    = IdentifierList ":=" ExpressionList .
+
+MethodDecl      = "func" Receiver identifier Signature [ Block ] .
+Receiver        = Parameters .
+```
+
+Semantic checks:
+Goto/break/continue labels vs other identifiers
+Type checking
